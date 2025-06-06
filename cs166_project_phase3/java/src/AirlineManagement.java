@@ -1,4 +1,4 @@
- import java.sql.DriverManager;
+import java.sql.DriverManager;
  import java.sql.Connection;
  import java.sql.Statement;
  import java.sql.ResultSet;
@@ -819,7 +819,7 @@
          System.out.print("Enter flight number: ");
          String flightNum = in.readLine();
 
-         System.out.print("Enter flight date (YYYY-MM-DD): ");
+         System.out.print("Enter flight date (M-D-YY): ");
          String flightDate = in.readLine();
 
          System.out.print("Enter number of tickets: ");
@@ -878,24 +878,39 @@
 }//end feature14
  
     public static void feature15(AirlineManagement esql) {
-        try {
-       System.out.print("Enter plane ID: ");
-       String planeID = in.readLine();
- 
-       System.out.print("Enter maintenance issue: ");
-       String issue = in.readLine();
- 
-       String query = String.format(
-          "INSERT INTO MaintenanceRequests (planeID, requestDate, description) " +
-          "VALUES ('%s', CURRENT_DATE, '%s');",
-          planeID, issue);
- 
-       esql.executeUpdate(query);
-       System.out.println("Maintenance request submitted!");
-       } catch (Exception e) {
-          System.err.println("Error submitting request: " + e.getMessage());
-       }
-    }//end feature15
+       try {
+        System.out.print("Enter your Pilot ID: ");
+        String pilotID = in.readLine();
+
+        System.out.print("Enter Plane ID: ");
+        String planeID = in.readLine();
+
+        // Check if Plane ID exists
+        String checkPlaneQuery = String.format("SELECT 1 FROM Plane WHERE PlaneID = '%s';", planeID);
+        List<List<String>> planeResult = esql.executeQueryAndReturnResult(checkPlaneQuery);
+        if (planeResult.isEmpty()) {
+           System.out.println("Error: Plane ID does not exist. Please enter a valid Plane ID.");
+           return;
+        }
+
+        System.out.print("Enter Repair Code: ");
+        String repairCode = in.readLine();
+
+        // Generate a random RequestID (e.g., using current time and random number)
+        int requestID = (int)(System.currentTimeMillis() % 1000000) + (int)(Math.random() * 10000);
+
+        String query = String.format(
+            "INSERT INTO MaintenanceRequest (RequestID, PilotID, PlaneID, RepairCode, RequestDate) " +
+            "VALUES (%d, '%s', '%s', '%s', CURRENT_DATE);",
+            requestID, pilotID, planeID, repairCode);
+
+        esql.executeUpdate(query);
+        System.out.println("Maintenance request submitted successfully.");
+
+      } catch (Exception e) {
+         System.err.println("Error creating maintenance request: " + e.getMessage());
+      }
+}//end feature15
  
     public static void feature16(AirlineManagement esql) {
     try {
