@@ -454,38 +454,66 @@ import java.sql.DriverManager;
  // Rest of the functions definition go in here
  
     public static void feature1(AirlineManagement esql) {
-       try {
-       System.out.print("Enter flight number: ");
-       String flightNumber = in.readLine();
- 
-       String query = String.format(
-          "SELECT DayOfWeek, DepartureTime, ArrivalTime FROM Schedule WHERE FlightNumber = '%s';",
-          flightNumber);
- 
-       esql.executeQueryAndPrintResult(query);
-       } catch (Exception e) {
-          System.err.println("Error: " + e.getMessage());
-       }
-    }//end feature1
+        try {
+        System.out.print("Enter flight number: ");
+        String flightNumber = in.readLine();
+
+        String query = String.format(
+            "SELECT DayOfWeek, DepartureTime, ArrivalTime " +
+            "FROM Schedule WHERE FlightNumber = '%s';",
+            flightNumber);
+
+        List<List<String>> result = esql.executeQueryAndReturnResult(query);
+
+        if (result.isEmpty()) {
+            System.out.println("No schedule found for flight number '" + flightNumber + "'. Please check the flight number and try again.");
+            return;
+        }
+
+        System.out.println("\n--- Flight Schedule ---");
+        for (List<String> row : result) {
+            System.out.println("Day of Week     : " + row.get(0));
+            System.out.println("Departure Time  : " + row.get(1));
+            System.out.println("Arrival Time    : " + row.get(2));
+            System.out.println("-----------------------------");
+        }
+
+      } catch (Exception e) {
+         System.err.println("Error retrieving flight schedule. Please make sure your input is valid.");
+      }
+}//end feature1
  
     public static void feature2(AirlineManagement esql) {
        try {
-       System.out.print("Enter flight number: ");
-       String flightNumber = in.readLine();
-       System.out.print("Enter flight date (M/D/YY): ");
-       String date = in.readLine();
- 
-       String query = String.format(
-          "SELECT SeatsTotal - SeatsSold AS SeatsAvailable, SeatsSold " +
-          "FROM FlightInstance WHERE FlightNumber = '%s' AND FlightDate = '%s';",
-          flightNumber, date);
- 
-       esql.executeQueryAndPrintResult(query);
-          } catch (Exception e)
-     {
-       System.err.println("Error: " + e.getMessage());
-     }
-    }//end feature2
+        System.out.print("Enter flight number: ");
+        String flightNumber = in.readLine();
+
+        System.out.print("Enter flight date (M/D/YY): ");
+        String date = in.readLine();
+
+        String query = String.format(
+            "SELECT SeatsTotal - SeatsSold AS SeatsAvailable, SeatsSold " +
+            "FROM FlightInstance WHERE FlightNumber = '%s' AND FlightDate = '%s';",
+            flightNumber, date);
+
+        List<List<String>> result = esql.executeQueryAndReturnResult(query);
+
+        if (result.isEmpty()) {
+            System.out.println("No flight instance found for flight number '" + flightNumber +
+                               "' on " + date + ". Please check your input and try again.");
+            return;
+        }
+
+        List<String> row = result.get(0);
+        System.out.println("\n--- Seat Availability ---");
+        System.out.println("Seats Available : " + row.get(0));
+        System.out.println("Seats Sold      : " + row.get(1));
+        System.out.println("--------------------------");
+
+      } catch (Exception e) {
+         System.err.println("Error retrieving seat availability. Please make sure your input is valid.");
+      }
+}//end feature2
  
     public static void feature3(AirlineManagement esql) {
       try {
@@ -520,20 +548,35 @@ import java.sql.DriverManager;
  
     public static void feature4(AirlineManagement esql) {
        try {
-       System.out.print("Enter date (M-D-YY): ");
-       String date = in.readLine();
- 
-       String query = String.format(
-          "SELECT FlightNumber, FlightDate, DepartureCity, ArrivalCity " +
-          "FROM FlightInstance JOIN Flight USING (FlightNumber) " +
-          "WHERE FlightDate = '%s';",
-          date);
- 
-       esql.executeQueryAndPrintResult(query);
-       } catch (Exception e) {
-          System.err.println("Error: " + e.getMessage());
-       }
-    }//end feature4
+        System.out.print("Enter date (M-D-YY): ");
+        String date = in.readLine();
+
+        String query = String.format(
+            "SELECT FlightNumber, FlightDate, DepartureCity, ArrivalCity " +
+            "FROM FlightInstance JOIN Flight USING (FlightNumber) " +
+            "WHERE FlightDate = '%s';",
+            date);
+
+        List<List<String>> result = esql.executeQueryAndReturnResult(query);
+
+        if (result.isEmpty()) {
+            System.out.println("No flights found on " + date + ". Please try a different date.");
+            return;
+        }
+
+        System.out.println("\n--- Flights on " + date + " ---");
+        for (List<String> row : result) {
+            System.out.println("Flight Number   : " + row.get(0));
+            System.out.println("Flight Date     : " + row.get(1));
+            System.out.println("Departure City  : " + row.get(2));
+            System.out.println("Arrival City    : " + row.get(3));
+            System.out.println("----------------------------------");
+        }
+
+      } catch (Exception e) {
+         System.err.println("Error retrieving flights. Please check the date format and try again.");
+      }
+}//end feature4
  
     public static void feature5(AirlineManagement esql) {
       try {
@@ -665,36 +708,68 @@ import java.sql.DriverManager;
  
     public static void feature8(AirlineManagement esql) {
         try {
-       System.out.print("Enter Technician ID: ");
-       String techID = in.readLine();
- 
-       String query = String.format("SELECT * FROM Repair WHERE TechnicianID = '%s';", techID);
- 
-       esql.executeQueryAndPrintResult(query);
-       } catch (Exception e) {
-          System.err.println("Error: " + e.getMessage());
-       }
-    }//end feature8
+        System.out.print("Enter Technician ID: ");
+        String techID = in.readLine();
+
+        String query = String.format("SELECT * FROM Repair WHERE TechnicianID = '%s';", techID);
+
+        List<List<String>> result = esql.executeQueryAndReturnResult(query);
+
+        if (result.isEmpty()) {
+            System.out.println("No repairs found for technician ID '" + techID + "'. Please check the ID and try again.");
+            return;
+        }
+
+        System.out.println("\n--- Repairs by Technician " + techID + " ---");
+        for (List<String> row : result) {
+            System.out.println("Repair ID       : " + row.get(0));
+            System.out.println("Plane ID        : " + row.get(1));
+            System.out.println("Repair Code     : " + row.get(2));
+            System.out.println("Repair Date     : " + row.get(3));
+            System.out.println("Tech ID         : " + row.get(4));
+            System.out.println("--------------------------------------------");
+        }
+
+    } catch (Exception e) {
+        System.err.println("Error retrieving repair records. Please ensure the technician ID is valid.");
+    }
+}//end feature8
  
     public static void feature9(AirlineManagement esql) {
         try {
-       System.out.print("Enter Plane ID: ");
-       String planeID = in.readLine();
-       System.out.print("Enter start date (YYYY-MM-DD): ");
-       String start = in.readLine();
-       System.out.print("Enter end date (YYYY-MM-DD): ");
-       String end = in.readLine();
- 
-       String query = String.format(
-          "SELECT RepairDate, RepairCode FROM Repair " +
-          "WHERE PlaneID = '%s' AND RepairDate BETWEEN '%s' AND '%s';",
-          planeID, start, end);
- 
-       esql.executeQueryAndPrintResult(query);
-       } catch (Exception e) {
-          System.err.println("Error: " + e.getMessage());
-       }  
-    }//end feature9
+        System.out.print("Enter Plane ID: ");
+        String planeID = in.readLine();
+
+        System.out.print("Enter start date (YYYY-MM-DD): ");
+        String start = in.readLine();
+
+        System.out.print("Enter end date (YYYY-MM-DD): ");
+        String end = in.readLine();
+
+        String query = String.format(
+            "SELECT RepairDate, RepairCode FROM Repair " +
+            "WHERE PlaneID = '%s' AND RepairDate BETWEEN '%s' AND '%s';",
+            planeID, start, end);
+
+        List<List<String>> result = esql.executeQueryAndReturnResult(query);
+
+        if (result.isEmpty()) {
+            System.out.println("No repair records found for Plane ID '" + planeID +
+                               "' between " + start + " and " + end + ".");
+            return;
+        }
+
+        System.out.println("\n--- Repairs for Plane " + planeID + " ---");
+        for (List<String> row : result) {
+            System.out.println("Repair Date  : " + row.get(0));
+            System.out.println("Repair Code  : " + row.get(1));
+            System.out.println("-----------------------------------");
+        }
+
+      } catch (Exception e) {
+         System.err.println("Error retrieving repair records. Please check your inputs and try again.");
+      }
+}//end feature9
  
     public static void feature10(AirlineManagement esql) {
     try {
@@ -735,9 +810,9 @@ import java.sql.DriverManager;
         System.out.println("Total Tickets Sold   : " + row.get(3));
         System.out.println("Total Tickets Unsold : " + row.get(4));
 
-    } catch (Exception e) {
-        System.err.println("Error: " + e.getMessage());
-    }
+      } catch (Exception e) {
+         System.err.println("Error: " + e.getMessage());
+      }
 }//end feature10
  
     public static void feature11(AirlineManagement esql) {
